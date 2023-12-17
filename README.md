@@ -15,6 +15,12 @@ Backednd withJava springboot
 ```bash
 Frontend with Nuxt js 3
 ```
+3. Tailwind Css
+
+```bash
+Styling with Tailwind css
+```
+
 ## Features
 
 1. Authentication
