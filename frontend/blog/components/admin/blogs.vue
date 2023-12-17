@@ -216,14 +216,15 @@
         <!-- Start coding here -->
 
         <div
+          v-if="isSearch"
           class="bg-white dark:bg-gray-800 relative shadow-md sm:rounded-lg overflow-hidden"
         >
           <div class="px-4 py-2 border-b flex justify-between flex-wrap">
             <div>
               <h1 class="font-bold text-1xl">
                 All Blogs
-                <span class="text-xs font-semi-bold px-3" v-if="blogs"
-                  >{{ blogs.length }} results</span
+                <span class="text-xs font-semi-bold px-3" v-if="searchedArray"
+                  >{{ paginatedBlogs.length }} results</span
                 >
               </h1>
             </div>
@@ -240,7 +241,26 @@
           <div
             class="flex flex-col md:flex-row items-center justify-between space-y-3 md:space-y-0 md:space-x-4 p-4"
           >
-            <div class="w-full md:w-1/2"></div>
+            <div class="w-full md:w-1/2">
+              <div>
+                <div class="flex space-x-3">
+                  <input
+                    type="text"
+                    id=""
+                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                    placeholder="Search here .."
+                    required
+                    v-model="searchQuery"
+                  />
+                  <button
+                    @click="filterBlogs"
+                    class="bg-indigo-700 p-1 px-4 rounded text-white"
+                  >
+                    Search
+                  </button>
+                </div>
+              </div>
+            </div>
             <div
               class="w-full md:w-auto flex flex-col md:flex-row space-y-2 md:space-y-0 items-stretch md:items-center justify-end md:space-x-3 flex-shrink-0"
             >
@@ -275,7 +295,7 @@
               <tbody v-if="blogs">
                 <tr
                   class="border-b dark:border-gray-700"
-                  v-for="(blog, i) in blogs"
+                  v-for="(blog, i) in searchedArray"
                   :key="i"
                 >
                   <th
@@ -373,7 +393,7 @@
                 total
               }}</span>
             </span> -->
-            <div class="text-center flex" v-if="last_page > 1">
+            <div class="text-center flex">
               <ul class="inline-flex items-stretch -space-x-px">
                 <li>
                   <button
@@ -398,55 +418,246 @@
                 </li>
                 <li>
                   <button
-                    @click="goFirst"
-                    class="flex items-center justify-center text-sm py-2 px-3 leading-tight text-gray-600 bg-white border border-gray-300 hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
-                    :class="{
-                      'bg-green-800 green-bg text-white': page == 1,
-                    }"
+                    class="flex items-center justify-center text-sm py-2 px-3 leading-tight text-white bg-indigo-700 border border-gray-300 hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
                   >
-                    1
+                    {{ page }}
                   </button>
                 </li>
-                <li v-if="page >= 3">
-                  <button
-                    class="flex items-center justify-center text-sm py-2 px-3 leading-tight text-gray-600 bg-white border border-gray-300 hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
-                  >
-                    {{ ".." }}
-                  </button>
-                </li>
-                <div v-for="n in 3" :key="n">
-                  <li v-if="page + n - 1 > 1 && page + n - 1 < last_page">
-                    <button
-                      class="flex items-center justify-center text-sm py-2 px-2.5 leading-tight text-gray-600 bg-white border border-gray-300 hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
-                      :class="{
-                        'bg-green-800 green-bg text-white':
-                          page == page + n - 1,
-                      }"
-                      @click="goTopage(page + n - 1)"
-                    >
-                      {{ page + n - 1 }}
-                    </button>
-                  </li>
-                </div>
 
-                <li v-if="page < last_page - 2">
+                <li>
                   <button
-                    class="flex items-center justify-center text-sm py-2 px-3 leading-tight text-gray-600 bg-white border border-gray-300 hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
+                    @click="getNext"
+                    class="flex items-center justify-center h-full py-1.5 px-2 leading-tight text-gray-600 bg-white rounded-r-lg border border-gray-300 hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
                   >
-                    ..
+                    <span class="sr-only">Next</span>
+                    <svg
+                      class="w-4 h-4"
+                      aria-hidden="true"
+                      fill="currentColor"
+                      viewbox="0 0 20 20"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        fill-rule="evenodd"
+                        d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
+                        clip-rule="evenodd"
+                      />
+                    </svg>
+                  </button>
+                </li>
+              </ul>
+            </div>
+          </nav>
+        </div>
+        <div
+          v-else
+          class="bg-white dark:bg-gray-800 relative shadow-md sm:rounded-lg overflow-hidden"
+        >
+          <div class="px-4 py-2 border-b flex justify-between flex-wrap">
+            <div>
+              <h1 class="font-bold text-1xl">
+                All Blogs
+                <span class="text-xs font-semi-bold px-3" v-if="blogs"
+                  >{{ paginatedBlogs.length }} results</span
+                >
+              </h1>
+            </div>
+            <div>
+              <button
+                type="button"
+                class="text-white bg-indigo-600 hover:bg-indigo-600 focus:outline-none focus:ring-4 focus:ring-indigo-300 font-medium rounded text-sm px-5 py-1 text-center mr-2 mb-2 dark:bg-indigo-600 dark:hover:bg-indigo-600 dark:focus:ring-indigo-800"
+                @click="getBlogs"
+              >
+                Refresh
+              </button>
+            </div>
+          </div>
+          <div
+            class="flex flex-col md:flex-row items-center justify-between space-y-3 md:space-y-0 md:space-x-4 p-4"
+          >
+            <div class="w-full md:w-1/2">
+              <div>
+                <div class="flex space-x-3">
+                  <input
+                    type="text"
+                    id=""
+                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                    placeholder="Search here .."
+                    required
+                    v-model="searchQuery"
+                  />
+                  <button
+                    @click="filterBlogs"
+                    class="bg-indigo-700 p-1 px-4 rounded text-white"
+                  >
+                    Search
+                  </button>
+                </div>
+              </div>
+            </div>
+            <div
+              class="w-full md:w-auto flex flex-col md:flex-row space-y-2 md:space-y-0 items-stretch md:items-center justify-end md:space-x-3 flex-shrink-0"
+            >
+              <div class="flex items-center space-x-3 w-full md:w-auto">
+                <button
+                  type="button"
+                  class="text-white bg-indigo-600 hover:bg-indigo-600 font-medium rounded py-1 mt-1 px-4 text-sm text-center mr-2 mb-2 dark:bg-indigo-600 dark:hover:bg-indigo-600"
+                  @click="openModel1"
+                >
+                  + New blog
+                </button>
+              </div>
+            </div>
+          </div>
+          <div class="overflow-x-auto">
+            <table
+              class="w-full text-sm text-left text-gray-600 dark:text-gray-400"
+            >
+              <thead
+                class="text-xs text-gray-700 capitalize bg-gray-50 dark:bg-gray-700 dark:text-gray-400"
+              >
+                <tr>
+                  <th scope="col" class="px-4 py-3">Title</th>
+                  <th scope="col" class="px-4 py-3">Images</th>
+                  <th scope="col" class="px-4 py-3">Description</th>
+                  <th scope="col" class="px-4 py-3">
+                    <span class="sr-only">Actions</span>
+                  </th>
+                </tr>
+              </thead>
+              <div v-if="isLoading" class="pl-5 py-5">Fetching data...</div>
+              <tbody v-if="blogs">
+                <tr
+                  class="border-b dark:border-gray-700"
+                  v-for="(blog, i) in paginatedBlogs"
+                  :key="i"
+                >
+                  <th
+                    scope="row"
+                    class="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white"
+                  >
+                    {{ blog.title }}
+                  </th>
+                  <td class="px-4 py-3">{{ blog.images.length }}</td>
+                  <td class="px-4 py-3">{{ blog.content }}</td>
+
+                  <td class="px-4 py-3 flex items-center justify-end">
+                    <button
+                      @click="editItem(blog)"
+                      id="apple-imac-27-dropdown-button"
+                      data-dropdown-toggle="apple-imac-27-dropdown"
+                      class="inline-flex items-center p-0.5 text-sm font-medium text-center text-gray-600 hover:text-gray-800 rounded-lg focus:outline-none dark:text-gray-400 dark:hover:text-gray-100"
+                      type="button"
+                    >
+                      <svg
+                        class="w-4 h-4"
+                        aria-hidden="true"
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="currentColor"
+                        viewBox="0 0 20 18"
+                      >
+                        <path
+                          d="M12.687 14.408a3.01 3.01 0 0 1-1.533.821l-3.566.713a3 3 0 0 1-3.53-3.53l.713-3.566a3.01 3.01 0 0 1 .821-1.533L10.905 2H2.167A2.169 2.169 0 0 0 0 4.167v11.666A2.169 2.169 0 0 0 2.167 18h11.666A2.169 2.169 0 0 0 16 15.833V11.1l-3.313 3.308Zm5.53-9.065.546-.546a2.518 2.518 0 0 0 0-3.56 2.576 2.576 0 0 0-3.559 0l-.547.547 3.56 3.56Z"
+                        />
+                        <path
+                          d="M13.243 3.2 7.359 9.081a.5.5 0 0 0-.136.256L6.51 12.9a.5.5 0 0 0 .59.59l3.566-.713a.5.5 0 0 0 .255-.136L16.8 6.757 13.243 3.2Z"
+                        />
+                      </svg>
+                    </button>
+                    <div class="mx-2"></div>
+                    <button
+                      @click="deleteItem(blog)"
+                      id="apple-imac-27-dropdown-button"
+                      data-dropdown-toggle="apple-imac-27-dropdown"
+                      class="inline-flex items-center p-0.5 text-sm font-medium text-center text-gray-600 hover:text-gray-800 rounded-lg focus:outline-none dark:text-gray-400 dark:hover:text-gray-100"
+                      type="button"
+                    >
+                      <svg
+                        class="w-4 h-4 text-red-600"
+                        aria-hidden="true"
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 18 20"
+                      >
+                        <path
+                          stroke="currentColor"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="2"
+                          d="M1 5h16M7 8v8m4-8v8M7 1h4a1 1 0 0 1 1 1v3H6V2a1 1 0 0 1 1-1ZM3 5h12v13a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V5Z"
+                        />
+                      </svg>
+                    </button>
+                    <div class="mx-2"></div>
+                    <nuxt-link
+                      :to="'/admin/blogs/' + blog.id"
+                      id="apple-imac-27-dropdown-button"
+                      data-dropdown-toggle="apple-imac-27-dropdown"
+                      class="inline-flex items-center p-0.5 text-sm font-medium text-center text-gray-600 hover:text-gray-800 rounded-lg focus:outline-none dark:text-gray-400 dark:hover:text-gray-100"
+                      type="button"
+                    >
+                      <svg
+                        class="w-4 h-4 dark:text-white"
+                        aria-hidden="true"
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="currentColor"
+                        viewBox="0 0 20 14"
+                      >
+                        <path
+                          d="M10 0C4.612 0 0 5.336 0 7c0 1.742 3.546 7 10 7 6.454 0 10-5.258 10-7 0-1.664-4.612-7-10-7Zm0 10a3 3 0 1 1 0-6 3 3 0 0 1 0 6Z"
+                        />
+                      </svg>
+                    </nuxt-link>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <nav
+            class="flex flex-col md:flex-row justify-between items-start md:items-center space-y-3 md:space-y-0 p-4"
+            aria-label="Table navigation"
+          >
+            <!-- <span class="text-sm font-normal text-gray-600 dark:text-gray-400">
+              Showing
+              <span class="font-semibold text-gray-900 dark:text-white"
+                >{{ from }}-{{ to }}</span
+              >
+              of
+              <span class="font-semibold text-gray-900 dark:text-white">{{
+                total
+              }}</span>
+            </span> -->
+            <div class="text-center flex">
+              <ul class="inline-flex items-stretch -space-x-px">
+                <li>
+                  <button
+                    @click="getPrevious"
+                    class="flex items-center justify-center h-full py-1.5 px-2 ml-0 text-gray-600 bg-white rounded-l-lg border border-gray-300 hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
+                  >
+                    <span class="sr-only">Previous</span>
+                    <svg
+                      class="w-4 h-4"
+                      aria-hidden="true"
+                      fill="currentColor"
+                      viewbox="0 0 20 20"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        fill-rule="evenodd"
+                        d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z"
+                        clip-rule="evenodd"
+                      />
+                    </svg>
                   </button>
                 </li>
                 <li>
                   <button
-                    @click="goLast"
-                    class="flex items-center justify-center text-sm py-2 px-3 leading-tight text-gray-600 bg-white border border-gray-300 hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
-                    :class="{
-                      'bg-green-800 green-bg text-white': page == last_page,
-                    }"
+                    class="flex items-center justify-center text-sm py-2 px-3 leading-tight text-white bg-indigo-700 border border-gray-300 hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
                   >
-                    {{ last_page }}
+                    {{ page }}
                   </button>
                 </li>
+
                 <li>
                   <button
                     @click="getNext"
@@ -491,6 +702,7 @@ export default {
       categories: [] as any,
       selectedItem: {} as any,
       isEdit: false,
+      isSearch: false,
       isLoading: false,
       showAlert: false,
       ascend: false,
@@ -503,6 +715,7 @@ export default {
       ppreview: "",
       plink: "",
       description: "",
+      searchedArray: [] as any,
       pamount: "",
       filterBy: "asc",
       errorMsg: "",
@@ -513,11 +726,13 @@ export default {
       from: 0,
       to: 0,
       total: 0,
-      per_page: 0,
+      per_page: 2,
       page: 1,
       last_page: 1,
+      searchQuery: "",
     };
   },
+
   computed: {
     userInfo() {
       const userInfo = localStorage.getItem("user_details");
@@ -528,6 +743,25 @@ export default {
       } else {
         return parsedUserInfo;
       }
+    },
+    paginatedBlogs() {
+      const start = (this.page - 1) * this.totalPages;
+      const end = start + this.per_page;
+      console.log("blogs p", this.blogs.slice(start, end));
+
+      return this.blogs.slice(start, end);
+    },
+    totalPages() {
+      return Math.ceil(this.blogs.length / this.per_page);
+    },
+    filteredBlogs1() {
+      // Filter posts based on the search query
+      const query = this.searchQuery.toLowerCase();
+      console.log("hiii");
+
+      return this.paginatedBlogs.filter((post: any) => {
+        return post.title.toLowerCase().includes(query);
+      });
     },
   },
   created() {
@@ -540,6 +774,8 @@ export default {
     },
     async getBlogs() {
       this.blogs = [];
+      this.searchQuery = "";
+      this.isSearch = false;
       try {
         this.isLoading = true;
         const { data, error, pending } = await useAxios(
@@ -567,14 +803,25 @@ export default {
         this.isLoading = false;
       }
     },
+    filterBlogs() {
+      console.log("hii");
+
+      this.paginatedBlogs.forEach((element: any) => {
+        // console.log("element", element);
+        if (
+          element.title
+            .toLocaleLowerCase()
+            .includes(this.searchQuery.toLocaleLowerCase())
+        ) {
+          this.isSearch = true;
+          this.searchedArray.push(element);
+        }
+      });
+    },
 
     getPrevious() {
       if (this.page > 1) {
-        this.page = this.page - 1;
-        this.getBlogs();
-      } else {
-        this.page = 1;
-        this.getBlogs();
+        this.page--;
       }
     },
     FilterAscend() {
@@ -596,11 +843,8 @@ export default {
       this.headerFilter = false;
     },
     getNext() {
-      if (this.page < this.last_page) {
-        this.page = this.page + 1;
-        this.getBlogs();
-      } else {
-        this.getBlogs();
+      if (this.page < this.totalPages) {
+        this.page++;
       }
     },
     goFirst() {

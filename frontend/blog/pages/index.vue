@@ -8,7 +8,7 @@
         <div class="flex justify-end">
           <svg
             @click="showAlert = false"
-            class="w-6 h-6 text-red dark:text-white cursor-pointer"
+            class="w-4 h-4 text-red dark:text-white cursor-pointer mr-5 my-1"
             aria-hidden="true"
             xmlns="http://www.w3.org/2000/svg"
             fill="red"
@@ -24,7 +24,7 @@
           type="danger"
           title="Failed"
           :text="errorMsg"
-          class="mb-4"
+          class="mb-4 mx-4"
         />
       </div>
       <div class="px-4 md:px-8 mt-5">
@@ -194,7 +194,7 @@ export default {
         }
         if (error.value) {
           this.showAlert = true;
-          this.errorMsg = error.value.data.errors;
+          this.errorMsg = "error occured refresh";
         }
       } catch (error) {
         // console.log("error", error);

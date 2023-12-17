@@ -4,7 +4,7 @@
       <div class="flex justify-end">
         <svg
           @click="showAlert = false"
-          class="w-6 h-6 text-red dark:text-white cursor-pointer"
+          class="w-4 h-4 text-red dark:text-white cursor-pointer mb-1"
           aria-hidden="true"
           xmlns="http://www.w3.org/2000/svg"
           fill="red"
@@ -40,7 +40,7 @@
         <div class="max-w-screen-xl mx-auto">
           <ul class="grid gap-x-8 gap-y-10 sm:grid-cols-2 lg:grid-cols-3">
             <li
-              v-for="(blog, index) in blogs"
+              v-for="(blog, index) in paginatedBlogs"
               :key="index"
               class="w-full mx-auto group sm:max-w-sm"
             >
@@ -90,6 +90,75 @@
             </li>
           </ul>
         </div>
+        <nav
+          class="flex flex-col md:flex-row justify-between items-start md:items-center space-y-3 md:space-y-0 p-4"
+          aria-label="Table navigation"
+        >
+          <!-- <span class="text-sm font-normal text-gray-600 dark:text-gray-400">
+              Showing
+              <span class="font-semibold text-gray-900 dark:text-white"
+                >{{ from }}-{{ to }}</span
+              >
+              of
+              <span class="font-semibold text-gray-900 dark:text-white">{{
+                total
+              }}</span>
+            </span> -->
+          <div class="text-center flex">
+            <ul class="inline-flex items-stretch -space-x-px">
+              <li>
+                <button
+                  @click="getPrevious"
+                  class="flex items-center justify-center h-full py-1.5 px-2 ml-0 text-gray-600 bg-white rounded-l-lg border border-gray-300 hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
+                >
+                  <span class="sr-only">Previous</span>
+                  <svg
+                    class="w-4 h-4"
+                    aria-hidden="true"
+                    fill="currentColor"
+                    viewbox="0 0 20 20"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      fill-rule="evenodd"
+                      d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z"
+                      clip-rule="evenodd"
+                    />
+                  </svg>
+                </button>
+              </li>
+              <li>
+                <button
+                  class="flex items-center justify-center text-sm py-2 px-3 leading-tight text-white bg-indigo-700 border border-gray-300 hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
+                >
+                  {{ page }}
+                </button>
+              </li>
+
+              <li>
+                <button
+                  @click="getNext"
+                  class="flex items-center justify-center h-full py-1.5 px-2 leading-tight text-gray-600 bg-white rounded-r-lg border border-gray-300 hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
+                >
+                  <span class="sr-only">Next</span>
+                  <svg
+                    class="w-4 h-4"
+                    aria-hidden="true"
+                    fill="currentColor"
+                    viewbox="0 0 20 20"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      fill-rule="evenodd"
+                      d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
+                      clip-rule="evenodd"
+                    />
+                  </svg>
+                </button>
+              </li>
+            </ul>
+          </div>
+        </nav>
       </section>
     </div>
   </div>
@@ -115,10 +184,11 @@ export default {
       from: 0,
       to: 0,
       total: 0,
-      per_page: 0,
+      per_page: 2,
       page: 1,
       last_page: 1,
       email: "",
+      searchQuery: "",
       // blogs: [
       //   {
       //     title: "What is SaaS? Software as a Service Explained",
@@ -154,6 +224,28 @@ export default {
   created() {
     this.getBlogs();
   },
+  computed: {
+    paginatedBlogs() {
+      const start = (this.page - 1) * this.totalPages;
+      const end = start + this.per_page;
+      console.log("blogs p", this.blogs.slice(start, end));
+
+      return this.blogs.slice(start, end);
+    },
+    totalPages() {
+      return Math.ceil(this.blogs.length / this.per_page);
+    },
+    filteredPosts() {
+      // Filter posts based on the search query
+      const query = this.searchQuery.toLowerCase();
+      return this.paginatedBlogs.filter((post: any) => {
+        return (
+          post.title.toLowerCase().includes(query) ||
+          post.body.toLowerCase().includes(query)
+        );
+      });
+    },
+  },
   methods: {
     async getBlogs() {
       this.blogs = [];
@@ -168,7 +260,7 @@ export default {
         }
         if (error.value) {
           this.showAlert = true;
-          this.errorMsg = error.value.data.errors;
+          this.errorMsg = "Error occured refresh";
         }
       } catch (error) {
         // console.log("error", error);
@@ -178,11 +270,7 @@ export default {
     },
     getPrevious() {
       if (this.page > 1) {
-        this.page = this.page - 1;
-        this.getBlogs();
-      } else {
-        this.page = 1;
-        this.getBlogs();
+        this.page--;
       }
     },
     FilterAscend() {
@@ -204,11 +292,8 @@ export default {
       this.headerFilter = false;
     },
     getNext() {
-      if (this.page < this.last_page) {
-        this.page = this.page + 1;
-        this.getBlogs();
-      } else {
-        this.getBlogs();
+      if (this.page < this.totalPages) {
+        this.page++;
       }
     },
     goFirst() {
@@ -222,69 +307,6 @@ export default {
     goTopage(i: any) {
       this.page = i;
       this.getBlogs();
-    },
-    async payVideo(place: any) {
-      console.log("place", place.id);
-      try {
-        this.showAlert = false;
-        this.isPaying = true;
-        const { data, error, pending } = await useAxios(
-          `/infoBeforePayment/${place.id}`,
-          {
-            method: "GET",
-          }
-        );
-        if (data.value) {
-          this.featuredPlace = data.value.place;
-          this.user = data.value.user;
-          // console.log("user", this.user);
-          // console.log("place", this.featuredPlace);
-          this.payNow();
-        }
-        if (error.value) {
-          this.showAlert = true;
-          this.errorMsg = error.value.data.errors;
-        }
-      } catch (error) {
-        // console.log("error", error);
-      } finally {
-      }
-    },
-    async payNow() {
-      try {
-        this.showAlert = false;
-        console.log("paying");
-
-        const { data, error, pending } = await useAxios("pay", {
-          method: "POST",
-          body: {
-            // email: this.user.email,
-            // first_name: this.user.first_name,
-            // last_name: this.user.last_name,
-            // phone_number: this.user.phone_number,
-            place_id: this.featuredPlace.id,
-            place_location: this.featuredPlace.place_location,
-            amount: this.featuredPlace.amount,
-            place_name: this.featuredPlace.place_name,
-          },
-        });
-
-        if (data.value) {
-          console.log("data", data.value);
-          const url = data.value;
-          window.location.href = url;
-        } else {
-          this.showAlert = true;
-          // console.log("error", error.value?.data?.message);
-          this.errorMsg = error.value?.data?.message || "Error Occured!";
-        }
-      } catch (error) {
-        this.showAlert = true;
-        console.log("error", error);
-        this.errorMsg = "error";
-      } finally {
-        // this.isPaying = false;
-      }
     },
   },
 };
