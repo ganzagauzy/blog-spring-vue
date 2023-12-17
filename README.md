@@ -7,13 +7,13 @@ A blog is a type of website or online platform where individuals or groups regul
 1. Java spring boot
 
 ```bash
-Java springboot
+Backednd withJava springboot
 ```
 
-2. Frontend with Nuxt js
+2. Nuxt js 3
 
 ```bash
-Nuxt js 3
+Frontend with Nuxt js 3
 ```
 ## Features
 
