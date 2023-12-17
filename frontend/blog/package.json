@@ -1,0 +1,25 @@
+{
+  "name": "nuxt-app",
+  "private": true,
+  "scripts": {
+    "build": "nuxt build",
+    "dev": "nuxt dev",
+    "generate": "nuxt generate",
+    "preview": "nuxt preview",
+    "postinstall": "nuxt prepare"
+  },
+  "devDependencies": {
+    "@nuxt/devtools": "latest",
+    "@nuxt/types": "^2.17.2",
+    "@nuxtjs/moment": "^1.6.1",
+    "@nuxtjs/tailwindcss": "^6.8.0",
+    "@types/node": "^18.17.3",
+    "nuxt": "^3.6.5",
+    "sass": "^1.68.0"
+  },
+  "dependencies": {
+    "apexcharts": "^3.41.1",
+    "flowbite": "^1.8.1",
+    "moment": "^2.29.4"
+  }
+}
