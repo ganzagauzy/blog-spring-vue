@@ -8,10 +8,10 @@ A blog is a type of website or online platform where individuals or groups regul
 The requirements of this project are authentication, blog or post managment (edit,read,update,delete) and also comment interactive where clients can give comments to a certain blog or post.
 
 ### Outcomes
--Authentication: unauthorised user is not allowed to access some pages only if he/she is authenticated.
--Blog managment: the admin has full access on blogs, he/she can create,edit,delete,read actions on blogs.
--Comments: clients will be able to send their reviews or replies through comments on a certain post.
--Emailing: Once a client send a comment the admin will be notified that someone has posted a comment on a certain blog and the client will be notified that his/her comment has been received.
+1. Authentication: unauthorised user is not allowed to access some pages only if he/she is authenticated.
+2. Blog managment: the admin has full access on blogs, he/she can create,edit,delete,read actions on blogs.
+3. Comments: clients will be able to send their reviews or replies through comments on a certain post.
+4. Emailing: Once a client send a comment the admin will be notified that someone has posted a comment on a certain blog and the client will be notified that his/her comment has been received.
 
 ## Project Plan
 
@@ -48,7 +48,7 @@ Styling with Tailwind css
 https://github.com/ganzagauzy/blog-spring-vue/tree/main/backend/blog
 ```
 2.Frontend
--have node js installed
+- have node js installed
 - cd blog
 - pnpm install
 - pnpm dev
@@ -139,13 +139,13 @@ public class Comment {
 ## User documentation
 
 ### Navigations
--Home: it redirects you to the landing page of the project.
--Blogs: it redirects you to the the blog page where clients can view all blogs.
--Contact: it redirects you to contact page where you can get owner's info.
--Admin: it redirects you to the admin page where the admin manages the blogs or posts.
--Register: it redirects you to the register page where you can register your self and become an admin.
--Login: it redirects you to login where you put your credentials and be logged in to access admin side.
--Logout: it logs the user out and redirect to landing page
+1. Home: it redirects you to the landing page of the project.
+2. Blogs: it redirects you to the the blog page where clients can view all blogs.
+3. Contact: it redirects you to contact page where you can get owner's info.
+4. Admin: it redirects you to the admin page where the admin manages the blogs or posts.
+5. Register: it redirects you to the register page where you can register your self and become an admin.
+6. Login: it redirects you to login where you put your credentials and be logged in to access admin side.
+7. Logout: it logs the user out and redirect to landing page
 
 ## Technical Documentation
 
@@ -154,9 +154,9 @@ public class Comment {
 
 ### Frameworks
 
--Java Springboot.
--Nuxt js
--Tailwind css
+- Java Springboot.
+- Nuxt js
+- Tailwind css
 
 
 
