@@ -45,7 +45,7 @@
           <div class="max-w-screen-xl mx-auto px-4 md:px-8">
             <ul class="grid gap-x-8 gap-y-10 sm:grid-cols-2 lg:grid-cols-3">
               <li
-                v-for="(blog, index) in blogs"
+                v-for="(blog, index) in blogs.slice(0, 3)"
                 :key="index"
                 class="w-full mx-auto group sm:max-w-sm"
               >
@@ -59,12 +59,14 @@
                   />
                   <div class="mt-3 space-y-2">
                     <div class="flex justify-between">
-                      <span class="block text-indigo-600 text-sm">{{
-                        blog.author.name
-                      }}</span>
-                      <span class="block text-indigo-600 text-sm">{{
-                        blog.date
-                      }}</span>
+                      <!-- <span class="block text-indigo-600 text-sm">{{
+                      blog.author.name
+                    }}</span> -->
+                      <span
+                        class="block text-indigo-600 text-sm"
+                        v-if="blog.created_at"
+                        >{{ blog.created_at.slice(0, 10) }}</span
+                      >
                     </div>
                     <h3
                       v-if="blog.title.lenght > 35"

@@ -54,12 +54,14 @@
                 />
                 <div class="mt-3 space-y-2">
                   <div class="flex justify-between">
-                    <span class="block text-indigo-600 text-sm">{{
+                    <!-- <span class="block text-indigo-600 text-sm">{{
                       blog.author.name
-                    }}</span>
-                    <span class="block text-indigo-600 text-sm">{{
-                      blog.date
-                    }}</span>
+                    }}</span> -->
+                    <span
+                      class="block text-indigo-600 text-sm"
+                      v-if="blog.created_at"
+                      >{{ blog.created_at.slice(0, 10) }}</span
+                    >
                   </div>
                   <h3
                     v-if="blog.title.lenght > 35"
@@ -184,7 +186,7 @@ export default {
       from: 0,
       to: 0,
       total: 0,
-      per_page: 2,
+      per_page: 6,
       page: 1,
       last_page: 1,
       email: "",
